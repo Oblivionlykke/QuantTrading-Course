@@ -1,0 +1,317 @@
+\documentclass[a4paper,12pt]{article}
+
+% 字体与页面
+\usepackage[UTF8]{ctex}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\usepackage{geometry}
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+\linespread{1.2} % n 倍行距
+\setlength{\parskip}{0em} % 段间距紧凑
+
+% 页眉页脚
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % 清除页眉页脚
+\cfoot{\arabic{page}} % 页脚序号
+\renewcommand{\headrulewidth}{0pt} % 清除页眉页脚线
+\setlength{\headheight}{15pt}
+
+% 标题格式
+\usepackage{titlesec}
+\renewcommand{\thesection}{\chinese{section}}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+\titleformat{\section}{\zihao{3}\heiti}{\thesection、}{0em}{}
+\titleformat{\subsection}{\zihao{4}\heiti}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\zihao{4}\heiti}{\thesubsubsection}{0.5em}{}
+
+% 代码环境
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{listingsutf8}
+\usepackage{upquote}   % 直引号显示
+\usepackage{subcaption}
+\usepackage{booktabs}
+
+
+\lstset{ 
+  backgroundcolor=\color{gray!5},      % 浅灰背景
+  frame=single,                        % 边框
+  rulecolor=\color{gray!50},           % 边框颜色
+  framerule=0.4pt,                     % 边框粗细
+  framesep=6pt,                        % 边框与代码间距
+  xleftmargin=0.5em, xrightmargin=0.5em, % 左右缩进
+  aboveskip=0.8em, belowskip=0.8em,    % 上下间距
+  basicstyle=\ttfamily\small,          % 等宽字体，小号
+  numbers=left,                        % 显示行号
+  numberstyle=\scriptsize\color{gray}, % 行号样式（更小、更淡）
+  numbersep=8pt,                       % 行号和代码的间距
+  breaklines=true,                     % 自动换行
+  breakatwhitespace=false,             % 可在单词中间断行
+  breakindent=0pt,                     % 换行后不缩进
+  prebreak=\raisebox{0ex}[0ex][0ex]{\(\hookleftarrow\)\,}, % 换行前标记
+  postbreak=\mbox{\space\(\hookrightarrow\)\space},        % 换行后标记
+  tabsize=4,                           % Tab=4空格
+  keepspaces=true,                     % 保留空格对齐
+  showstringspaces=false,              % 不标记字符串里的空格
+  keywordstyle=\bfseries\color{blue!70!black}, % 关键字 蓝+加粗
+  commentstyle=\itshape\color{green!40!black}, % 注释 斜体墨绿
+  stringstyle=\color{orange!90!black},         % 字符串 橙色
+  literate=
+    *{0}{{{\color{purple}0}}}{1}
+     {1}{{{\color{purple}1}}}{1}
+     {2}{{{\color{purple}2}}}{1}
+     {3}{{{\color{purple}3}}}{1}
+     {4}{{{\color{purple}4}}}{1}
+     {5}{{{\color{purple}5}}}{1}
+     {6}{{{\color{purple}6}}}{1}
+     {7}{{{\color{purple}7}}}{1}
+     {8}{{{\color{purple}8}}}{1}
+     {9}{{{\color{purple}9}}}{1}
+}
+
+% 其他包
+\usepackage[super, sort, compress]{cite}
+\usepackage{graphicx, booktabs, tabularx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{appendix}
+\usepackage{caption}
+\usepackage{longtable}
+\usepackage{float}
+
+\captionsetup{font=small}
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=0.5ex, parsep=0ex, topsep=0.5ex}
+\usepackage{array}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+% 信息
+\title{}
+\author{}
+\date{}
+
+
+%%%%%%%%%%%%%%% 正文 %%%%%%%%%%%%%%%
+\begin{document}
+
+\begin{center}
+{\zihao{-2}\heiti 量化交易作业4}
+\end{center}
+
+\section{实测最佳因子策略全流程}
+\subsection{调仓频率、因子选择和数据处理}
+\begin{itemize}
+\item 频率：周频
+\item 因子：计算过去20个交易日当日的隔夜涨跌幅和昨日换手率的相关系数，取负数作为因子，具体计算如下：
+$$\text{alpha} = -\text{corr}(\text{overnight\_ret}, \text{yesterday\_turnover\_ratio}, \text{window}=20)$$
+这个因子可以解释为：提前取得新信息的交易者（也叫知情交易者）会对股价的反转造成负面影响。
+股价上升时，如果有交易者提前获取新信息，会加速这个上升的过程，导致之后的反转更加剧烈；
+而在股价下跌时，如果有交易者提前获取新信息，加速股价的下跌，可能会让股价跌破非知情交易者的预期，由于处置效应，减少反弹的程度。
+综合来看，知情交易者的参与会导致股票未来的收益偏低，所以我们给因子加上负号。
+\item 数据处理：股票选择HS300成分股，基准选择HS300指数（从Choice获取），数据频率为日频
+\end{itemize}
+
+\subsection{训练集累积IC曲线}
+我们计算每个交易日的因子值，并利用MAD方法去极值。
+之后调整频率为周频，绘制因子在训练集中的累积IC曲线如下：
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Pictures/Hw4_cumulative_ic.png}
+    \caption{训练集：因子累计IC值}
+\end{figure}
+
+可以看出，训练集上因子的IC持续递增，说明因子的预测能力较好。
+
+\subsection{验证集因子筛选}
+接着，我们在验证集上进行筛选，确保因子在其他时间段也能保持正向预测能力。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Pictures/Hw4_cumulative_ic_val.png}
+    \caption{验证集：因子累计IC值}
+\end{figure}
+
+可以看出，验证集上因子的累积IC波动明显增加，但依然保持向上的趋势，
+再加上2021-2022年环境的影响，所以我们认为因子依然具备一定的预测能力，通过筛选。
+
+\subsection{测试集表现}
+
+最后我们在测试集上对因子进行实测。首先，累积IC曲线如下：
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Pictures/Hw4_cumulative_ic_test.png}
+    \caption{测试集：因子累计IC值}
+\end{figure}
+
+可以看出，在测试集上，因子的累积IC整体表现较好，虽然在2023年初出现了下降，但随后又迅速上升，
+这印证了我们先前判断的：验证集的波动是由环境引起的，而非因子彻底失效。
+所以综合来看，这个因子具备一定的预测能力。
+
+接下来我们将因子转换成权重，具体规则设定为：每个bar中，将股票按照因子值进行从高到低的排序，分为12组；
+做多因子值最高的1组，做空因子值最低的12组，多头组和空头组的总权重是0.5和-0.5，组内等权分配。
+（也就是只取因子得分最高的25只股票和因子得分最低的25只股票，总共50只）
+用计算好的权重计算日频收益率，绘制PnL曲线如下：
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Pictures/Hw4_strategy_pnl_with_benchmark.png}
+    \caption{测试集：策略累计收益率曲线}
+\end{figure}
+
+可以看出，累计收益率在基准线的波动时期大幅跑赢，且趋势和累计IC曲线基本一致，
+整体收益略高于基准，且波动较小，比较稳定。
+最后我们计算具体指标，和基准指数进一步对比：
+
+\begin{table}[H]
+\centering
+\caption{测试集：指标对比}
+\begin{tabular}{lccccc}
+\toprule
+& 日收益率 & 日收益率标准差 & 年化收益率 & 夏普比率	& 最大回撤 \\
+\midrule
+alpha & \textbf{0.034\%} & \textbf{0.37\%} & \textbf{9.06\%} & \textbf{1.07} & \textbf{-4.59\%}\\
+沪深300指数 & 0.032\% & 1.07\% & 8.37\% & 0.33 & -24.80\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+根据数据来看，这个因子在测试集上收益略高于基准，且波动率远小于基准，因此夏普比高于基准，最大回撤也有非常好的改善，
+可以认为这个因子具有一定的价值。
+
+%%%%%%%%%%%%%%%%%%% 三 %%%%%%%%%%%%%%%%%%%%
+\section{其他因子策略全流程}
+
+策略研究中通过验证集筛选的其他因子流程也展示如下。
+
+\subsection{调仓频率、因子选择和数据处理}
+\begin{itemize}
+\item 频率：周频
+\item 技术因子1：计算过去20个交易日平均换手率的相反数，具体计算如下：
+$$
+\text{alpha\_pv\_1} = - \mathrm{mean}(\text{turnover\_ratio}, \text{window}=20)
+$$
+\item 技术因子2：计算过去5个交易日换手率标准差的相反数，具体计算如下：
+$$
+\text{alpha\_pv\_2} = - \mathrm{std}(\text{turnover\_ratio}, \text{window}=5)
+$$
+\item 技术因子3：计算过去5个交易日平均收益率的相反数，具体计算如下：
+$$
+\text{alpha\_pv\_3} = - \mathrm{mean}(\text{ret}, \text{window}=5)
+$$
+
+这三个因子都表示市场的反转，换手率的均值和标准差越大，说明市场波动明显，反转较大，不看好；收益率较大也说明市场有反转的可能，不看好。
+
+\item 基本面因子1：计算过去20个交易日总市值涨跌幅的相反数，具体计算如下：
+$$
+\text{alpha\_fund\_1} = - \text{delta}_{20}(\text{market\_cap})
+$$
+这个因子表示，市值涨幅大，说明市场预期较高，可能被高估，所以不看好。
+
+\item 基本面因子2：计算市盈率倒数在截面上的分位数排名，具体计算如下：
+$$
+\text{alpha\_fund\_2} = \mathrm{rank}_{pct}\left(\frac{1}{\text{pe\_ratio}}\right)
+$$
+这个因子表示，市盈率较低的股票可能被低估，所以看好。
+
+\item 基本面因子3：计算每股收益与股价之比在截面上的分位数排名，具体计算如下：
+$$
+\text{alpha\_fund\_3} = \mathrm{rank}_{pct}\left(\frac{\text{basic\_eps}}{\text{close}}\right)
+$$
+这个因子表示，每股收益较高的股票可能被低估，所以看好。
+
+\item 数据处理：股票选择HS300成分股，基准选择HS300指数（从Choice获取），数据频率为日频
+\end{itemize}
+
+\subsection{训练集累积IC曲线}
+同样的，我们计算每个交易日的因子值，并利用MAD方法去极值。
+之后调整频率为周频，绘制因子在训练集中的累积IC曲线如下：
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Pictures/Hw4_cumulative_ic_others.png}
+    \caption{训练集：因子累计IC值}
+\end{figure}
+
+可以看出，训练集上每个因子的IC都保持递增，说明这些因子都具有一定的预测能力。
+
+\subsection{验证集因子筛选}
+接着，我们在验证集上进行筛选。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Pictures/Hw4_cumulative_ic_val_others.png}
+    \caption{验证集：因子累计IC值}
+\end{figure}
+
+可以看出，验证集上所有因子的表现都有所下降，但都保持上升趋势，所以这些因子都通过筛选。
+
+\subsection{测试集表现}
+
+最后我们在测试集上对这些因子统一进行实测。首先，累积IC曲线如下：
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Pictures/Hw4_cumulative_ic_test_others.png}
+    \caption{测试集：因子累计IC值}
+\end{figure}
+
+可以看出，在测试集上，有两个因子（alpha\_pv\_3、alpha\_fund\_1）的累积大幅下降，在0附近波动，说明在测试集上预测能力基本失效，
+而其他因子相对保持较好，可以认为有一定的预测能力。
+
+接下来用相同的方式把因子转换成权重，
+用计算好的权重计算日频收益率，绘制PnL曲线如下：
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Pictures/Hw4_strategy_pnl_with_benchmark_others.png}
+    \caption{测试集：策略累计收益率曲线}
+\end{figure}
+
+可以看出，除了两个失效的因子外，其他因子前期表现较好，在市场指数下跌时能保持上升趋势，
+但是在2024年9月后，当市场指数回升时，所有因子策略均表现出大幅下降，整体表现均不如基准指数。
+
+\begin{table}[H] 
+\centering
+\caption{测试集：指标对比}
+\begin{tabular}{lccccc}
+\toprule
+ & 日收益率 & 日收益率标准差 & 年化收益率 & 夏普比率 & 最大回撤 \\
+\midrule
+alpha\_fund\_1 & -0.024\% & 0.90\% & -5.74\% & -0.60 & -27.85\% \\
+alpha\_fund\_2 & 0.023\% & \textbf{0.75\%} & 6.02\% & 0.27 & \textbf{-16.48\%} \\
+alpha\_fund\_3 & 0.023\% & \textbf{0.76\%} & 5.83\% & 0.26 & \textbf{-17.65\%} \\
+alpha\_pv\_1   & 0.0040\% & 0.95\% & 1.01\% & -0.11 & -34.76\% \\
+alpha\_pv\_2   & 0.020\% & 0.86\% & 5.23\% & 0.18 & -22.64\% \\
+alpha\_pv\_3   & 0.0018\% & 0.82\% & 0.45\% & -0.18 & \textbf{-15.54\%} \\
+沪深300指数   & \textbf{0.032\%} & 1.07\% & \textbf{8.37\%} & \textbf{0.33} & -24.80\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+根据数据来看，所有因子策略的年化收益率和夏普比率均未超过沪深300。
+虽然alpha\_pv\_3的最大回撤优于基准，但整体收益过低。只有alpha\_fund\_2和alpha\_fund\_3最大回撤小于基准的前提下，收益风险略逊于基准。
+所以，结合累积IC曲线和PnL曲线来看，除了两个失效的因子外，其他因子虽然有可能包含一定的信号，但需要进一步优化投资组合的构造方式，才有可能获得实测表现。
+
+\subsection{因子策略失效的简要讨论}
+
+为了探究2024年9月后因子策略大幅下降的原因，我选择了前期收益最高的alpha\_pv\_1因子进行分析。
+把12个组的股票表现和多空组合的表现绘制在一张图上进行对比：
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Pictures/Hw4_pv1.png}
+    \caption{测试集：alpha\_pv\_1因子分组表现}
+\end{figure}
+
+可以看出，前期这个因子的区分度很好，1组的表现最好，12组的表现最差，这也解释了前期多空组合上涨的原因。
+但在2024年9月后，随着市场的大幅上涨和下跌，以及之后一段时期的大幅波动，所有组的表现都受到了市场的影响，因子的区分度明显下降，导致了这段时期多空组合表现下跌和持续波动。
+而在2025年5月后，市场出现缓慢的回升，但在这个时期，空头组的表现反而上升的更快，进一步缩减了不同组的区分，这让多空组合的收益大幅下降。
+所以，因子策略表现不好是因为：在市场发生剧烈变化（不论好坏）的时期和变化后的调整时期，因子无法很好的区分不同股票，这样构造的多空组合也无法从截面差异获得收益，所以只能通过其他方式构造组合才能在市场变化调整时避免这种情况出现。
+
+\end{document}

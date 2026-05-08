@@ -1,0 +1,517 @@
+\documentclass[a4paper,12pt]{article}
+
+% 字体与页面
+\usepackage[UTF8]{ctex}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\usepackage{geometry}
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+\linespread{1.2} % n 倍行距
+\setlength{\parskip}{0em} % 段间距紧凑
+
+% 页眉页脚
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % 清除页眉页脚
+\cfoot{\arabic{page}} % 页脚序号
+\renewcommand{\headrulewidth}{0pt} % 清除页眉页脚线
+\setlength{\headheight}{15pt}
+
+% 标题格式
+\usepackage{titlesec}
+\renewcommand{\thesection}{\chinese{section}}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+\titleformat{\section}{\zihao{3}\heiti}{\thesection、}{0em}{}
+\titleformat{\subsection}{\zihao{4}\heiti}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\zihao{4}\heiti}{\thesubsubsection}{0.5em}{}
+
+% 代码环境
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{listingsutf8}
+\usepackage{upquote}   % 直引号显示
+\usepackage{subcaption}
+\usepackage{booktabs}
+
+
+\lstset{ 
+  backgroundcolor=\color{gray!5},      % 浅灰背景
+  frame=single,                        % 边框
+  rulecolor=\color{gray!50},           % 边框颜色
+  framerule=0.4pt,                     % 边框粗细
+  framesep=6pt,                        % 边框与代码间距
+  xleftmargin=0.5em, xrightmargin=0.5em, % 左右缩进
+  aboveskip=0.8em, belowskip=0.8em,    % 上下间距
+  basicstyle=\ttfamily\small,          % 等宽字体，小号
+  numbers=left,                        % 显示行号
+  numberstyle=\scriptsize\color{gray}, % 行号样式（更小、更淡）
+  numbersep=8pt,                       % 行号和代码的间距
+  breaklines=true,                     % 自动换行
+  breakatwhitespace=false,             % 可在单词中间断行
+  breakindent=0pt,                     % 换行后不缩进
+  prebreak=\raisebox{0ex}[0ex][0ex]{\(\hookleftarrow\)\,}, % 换行前标记
+  postbreak=\mbox{\space\(\hookrightarrow\)\space},        % 换行后标记
+  tabsize=4,                           % Tab=4空格
+  keepspaces=true,                     % 保留空格对齐
+  showstringspaces=false,              % 不标记字符串里的空格
+  keywordstyle=\bfseries\color{blue!70!black}, % 关键字 蓝+加粗
+  commentstyle=\itshape\color{green!40!black}, % 注释 斜体墨绿
+  stringstyle=\color{orange!90!black},         % 字符串 橙色
+  literate=
+    *{0}{{{\color{purple}0}}}{1}
+     {1}{{{\color{purple}1}}}{1}
+     {2}{{{\color{purple}2}}}{1}
+     {3}{{{\color{purple}3}}}{1}
+     {4}{{{\color{purple}4}}}{1}
+     {5}{{{\color{purple}5}}}{1}
+     {6}{{{\color{purple}6}}}{1}
+     {7}{{{\color{purple}7}}}{1}
+     {8}{{{\color{purple}8}}}{1}
+     {9}{{{\color{purple}9}}}{1}
+}
+
+% 其他包
+\usepackage[super, sort, compress]{cite}
+\usepackage{graphicx, booktabs, tabularx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{appendix}
+\usepackage{caption}
+\usepackage{longtable}
+\usepackage{float}
+
+\captionsetup{font=small}
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=0.5ex, parsep=0ex, topsep=0.5ex}
+\usepackage{array}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+% 信息
+\title{}
+\author{}
+\date{}
+
+
+%%%%%%%%%%%%%%% 正文 %%%%%%%%%%%%%%%
+\begin{document}
+
+\begin{center}
+{\zihao{-2}\heiti 量化交易作业1}
+\end{center}
+
+\section{简单回答以下问题：}
+
+\subsection{对量化投资的理解}
+
+按照课上所学，量化投资是指借助数学、计算机的工具，对历史数据进行分析，
+得到市场蕴含的规律，进而获得投资策略，实现稳定且较高的收益。
+在此之后，我们把策略转换成可执行的程序，借助计算机的帮助实现自动化交易，
+而后面这个过程称为量化交易。“量化”是相较于“主观”而言的，我们需要将投资选择表现为客观的度量，
+比如需要从数据出发，借助数学、统计等相关知识进行分析和定量描述，最终由计算机执行。
+
+\subsection{选这门课的主要目的}
+
+一个目的是想了解量化投资的基本方法，即怎样构建一个投资策略，
+因为这部分知识在网络上很碎片化，而我已经学习了数学、统计和计算机的相关知识，
+想通过这门课了解量化投资的完整框架，为后续的实习工作做准备。
+
+另一个目的是想参与到具体的实证分析项目中，来提升我的实践能力和Coding能力。
+此前我接触过与量化投资强相关的项目很少，因此这门课能为我提供很多有价值的题目去思考和练习。
+
+\subsection{专业背景：本科专业，目前的职业规划}
+
+我的本科专业是金融数学，现在对策略研究和衍生品相关内容比较感兴趣。
+
+关于未来的职业规划，我希望将来能参与到量化策略研究的工作中。
+我已经学习了数学方面的概率统计和随机过程内容，计算机方面的算法和数据分析内容，
+还需要通过这门课和后续课程了解量化投资的框架、衍生品知识、优化方法等内容，
+并参与到一些企业的实习中，进一步确定自己想选择的方向。
+
+
+\section{编程建模}
+
+\subsection{基本统计量}
+
+首先，我通过Python的Pandas库导入数据。
+股票类中，为了区分不同行业的股票差别，让研究尽可能体现股票市场的整体特征，而非单一行业的结果，
+我选择从5个不同的Wind一级行业中分别选择2022年9月2日总市值最高的股票，选择结果为：
+金融行业的工商银行，能源行业的中国石油，材料行业的万华化学，房地产行业的保利发展，日常消费行业的贵州茅台。
+期货类中，我选择反映市场情况的沪深300期货主力日数据进行分析。
+期权类中，我选择上证50ETF认购期权1分钟中的50ETF购9月2850进行分析。
+市场指数类中，我继续选择反映市场情况的沪深300指数日数据。
+最后在指数ETF类中，我选择上证50ETF日数据。
+
+然后我对数据进行清洗，将原始数据中的“0”（缺失）转换为np.nan形式，在后续数值计算中忽略，
+最后分别对每一只证券用Numpy库进行统计量的计算，如下表所示：
+
+\begin{table}[H]
+\centering
+\caption{股票收益率统计描述}
+\begin{tabularx}{\textwidth}{lCCCCC}
+\toprule
+ & 工商银行 & 中国石油 & 万华化学 & 保利发展 & 贵州茅台 \\
+\midrule
+均值 & 0.000153 & -0.000187 & 0.000685 & 0.000410 & 0.000941 \\
+中位数 & 0.000000 & 0.000000 & 0.000000 & 0.000000 & 0.000270 \\
+标准差 & 0.012867 & 0.015475 & 0.024380 & 0.025743 & 0.019648 \\
+偏度 & 0.004247 & 0.006797 & -0.026884 & 0.056562 & 0.015606 \\
+超额峰度 & 11.318806 & 9.174149 & 2.103996 & 2.453718 & 2.328405 \\
+最大值 & 0.095310 & 0.095636 & 0.095557 & 0.095654 & 0.095310 \\
+最小值 & -0.105134 & -0.105244 & -0.105573 & -0.105662 & -0.105361 \\
+自相关系数 & -0.007732 & -0.004141 & 0.009093 & 0.020617 & 0.005697 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{期货与指数收益率统计描述}
+\begin{tabularx}{\textwidth}{lCCCC}
+\toprule
+ & 沪深300期货 & 上证50ETF认购期权 & 沪深300指数 & 上证50ETF \\
+\midrule
+均值 & 0.000054 & -0.000248 & 0.000223 & 0.000337 \\
+中位数 & -0.000053 & 0.000000 & 0.000607 & 0.000000 \\
+标准差 & 0.015929 & 0.012603 & 0.016271 & 0.016916 \\
+偏度 & -0.413533 & -0.231265 & -0.407997 & -0.155948 \\
+超额峰度 & 7.006755 & 12.004028 & 4.197966 & 5.070942 \\
+最大值 & 0.097371 & 0.136393 & 0.089748 & 0.095780 \\
+最小值 & -0.106357 & -0.147901 & -0.096952 & -0.105455 \\
+自相关系数 & -0.003339 & -0.076077 & 0.023000 & -0.010648 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+可以看出，第一，各类资产的均值接近于0，说明收益更多表现为随机波动，而非稳定的结果。
+第二，各类资产的标准差远大于均值，这说明短期收益波动远强于平均收益，收益变化主要由波动主导。
+股票里万华化学和保利发展的标准差最大，说明材料行业和房地产行业的波动率更明显，而银行最稳定，进而说明行业对股票收益率的变化有影响。
+第三，各类资产的偏度整体接近于0，但部分资产尤其是指数和衍生品的偏度为负，说明需要警惕这些资产的负收益风险。
+第四，各类资产的峰度较高，所有资产的超额峰度均大于0，说明其收益率有尖峰、厚尾的特点，也就是说收益率集中在均值，但极端收益率出现的概率大于正态分布情形。
+第五，对比最大值与最小值，说明负向收益的极端值大于正向收益，因此负收益的风险更大。
+第六，自相关系数均接近于0，说明股票收益率的线性预测性较低。
+
+\subsection{收益率分布}
+
+对于上一问所选择的各个资产，我使用Matplotlib库对收益率分布进行可视化，
+并绘制相同期望、方差的正态分布曲线与之对比：
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Pictures/股票_工商银行.png}
+\caption*{(a)工商银行}
+\end{subfigure}
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Pictures/股票_中国石油.png}
+\caption*{(b)中国石油}
+\end{subfigure}
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Pictures/股票_万华化学.png}
+\caption*{(c) 万华化学}
+\end{subfigure}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Pictures/股票_保利发展.png}
+\caption*{(d)保利发展}
+\end{subfigure}
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Pictures/股票_贵州茅台.png}
+\caption*{(e)贵州茅台}
+\end{subfigure}
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Pictures/期货.png}
+\caption*{(f)沪深300期货}
+\end{subfigure}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Pictures/期权.png}
+\caption*{(g)上证50ETF认购期权}
+\end{subfigure}
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Pictures/市场指数.png}
+\caption*{(h)沪深300指数}
+\end{subfigure}
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Pictures/指数ETF.png}
+\caption*{(i)上证50ETF}
+\end{subfigure}
+
+\caption{各资产对数收益率分布与正态拟合}
+\end{figure}
+
+先观察图像，所有资产的频率分布均接近正态分布的形式，大量数据在均值附近，但均呈现出与正态分布不同的尖峰特点，且个别资产出现长尾的现象。
+
+接着，我们对所有资产的收益率分布进行Jarque–Bera检验，确认其是否符合正态分布，结果如下表：
+
+\begin{table}[H]
+\centering
+\small
+\caption{各资产收益率的偏度、峰度及Jarque--Bera正态性检验结果}
+\begin{tabular}{lcccc}
+\toprule
+资产 & 偏度 & 超额峰度 & JB统计量 & p值 \\
+\midrule
+工商银行 & 0.004247 & 11.318806 & 16377.181094 & $<10^{-300}$ \\
+中国石油 & 0.006797 & 9.174149 & 10758.091901 & $<10^{-300}$ \\
+万华化学 & -0.026884 & 2.103996 & 565.400201 & $1.68\times10^{-123}$ \\
+保利发展 & 0.056562 & 2.453718 & 770.320567 & $5.33\times10^{-168}$ \\
+贵州茅台 & 0.015606 & 2.328405 & 692.236670 & $4.82\times10^{-151}$ \\
+沪深300期货 & -0.413533 & 7.006755 & 6221.135394 & $<10^{-300}$ \\
+上证50ETF认购期权 & -0.231265 & 12.004028 & 36306.263269 & $<10^{-300}$ \\
+沪深300指数 & -0.407997 & 4.197966 & 3812.072327 & $<10^{-300}$ \\
+上证50ETF & -0.155948 & 5.070942 & 4575.861866 & $<10^{-300}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+从检验结果可以看出，$p$值远小于显著性水平0.05，说明拒绝原假设，收益率分布不服从正态分布，
+另外由于超额峰度均大于0（这里计算用的是Pandas库中的kurt()函数），说明收益率分布的确具有尖峰、厚尾的特点，与图像观察的结果一致。
+
+\subsection{价格时间序列}
+
+基于第（1）问选择的各类资产，我使用Matplotlib库对价格曲线进行可视化如下。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{Pictures/股票_工商银行_价格.png}
+\caption{工商银行价格时间序列}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{Pictures/股票_中国石油_价格.png}
+\caption{中国石油价格时间序列}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{Pictures/股票_万华化学_价格.png}
+\caption{万华化学价格时间序列}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{Pictures/股票_保利发展_价格.png}
+\caption{保利发展价格时间序列}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{Pictures/股票_贵州茅台_价格.png}
+\caption{贵州茅台价格时间序列}
+\end{figure}
+
+如上图，股票类的价格曲线在不同阶段有趋势的平稳变换和突变。
+万华化学和贵州茅台整体呈现较强的长期上涨，均在2021年前后达到高点，之后出现回落；
+保利发展在长期上涨的过程中波动率较大，工商银行则波动率相对较小，分别在2021年和2018年达到高点；
+中国石油则存在着长期下跌趋势，但在2015年前后出现暴涨和迅速下跌。
+因此，不同行业的股票在长期趋势和短期波动均存在明显差异。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{Pictures/市场指数_价格.png}
+\caption{沪深300指数价格时间序列}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{Pictures/期货_价格.png}
+\caption{沪深300期货价格时间序列}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{Pictures/指数ETF_价格.png}
+\caption{上证50ETF价格时间序列}
+\end{figure}
+
+如上图，相较于股票，沪深300指数、沪深300期货和上证50ETF的价格波动更加剧烈，但呈现出一定的同步趋势，在2008年、2015年和2020年前后均出现明显的高点，之后出现暴跌回落；
+说明指数、ETF和股指期货之间有一定的相关性。
+虽然沪深300指数和上证50ETF跟踪的标的不完全一致，但二者都能反映市场的整体趋势，因此一致性较高是合理的。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{Pictures/期权_价格.png}
+\caption{上证50ETF认购期权价格时间序列}
+\end{figure}
+
+如上图，上证50ETF认购期权价格整体呈现下降趋势，伴随着波动，与前面的股票和其他资产价格变动不同，
+可能是由于期权随着接近到期日，价格也逐渐衰减的原因。
+
+总的来说，金融资产价格首先受到种类的影响，不同种类的资产由于机制不同，存在明显差异；
+其次，单一资产的价格变动有阶段特征，但不同资产中出现价格剧烈变动的时刻具有一定的同步性，说明整体的经济环境会对资产造成较大的影响。
+
+\subsection{进阶1：同一指数、ETF和期货的收益率序列关系}
+
+我选择上证50指数进行考虑，通过Numpy库计算并绘制三者的收益率序列的相关性矩阵。
+如下图可以看出，三者收益率序列呈现出极高的相关性，因为三者追踪的都是上证50的标的，这印证了ETF和期货价格依赖于标的变量。
+但相关性达不到1，说明受到交易机制的影响，资产价格也会发生变化。
+
+\begin{table}[H]
+\centering
+\caption{上证50、上证50ETF与上证50期货收益率相关系数}
+\begin{tabular}{lccc}
+\toprule
+ & 上证50 & 上证50ETF & 上证50期货 \\
+\midrule
+上证50      & 1.00 & 0.99 & 0.95 \\
+上证50ETF   & 0.99 & 1.00 & 0.96 \\
+上证50期货  & 0.95 & 0.96 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{进阶2：不同股票、期货的同期收益率的相关性}
+
+首先我们选择第1问的5只不同行业的股票，通过Numpy库计算收益率并绘制相关性矩阵如下：
+
+\begin{table}[H]
+\centering
+\caption{股票收益率相关系数矩阵}
+\begin{tabular}{lccccc}
+\toprule
+ & 工商银行 & 中国石油 & 万华化学 & 保利发展 & 贵州茅台 \\
+\midrule
+工商银行 & 1.00 & 0.36 & 0.29 & 0.48 & 0.27 \\
+中国石油 & 0.36 & 1.00 & 0.34 & 0.29 & 0.12 \\
+万华化学 & 0.29 & 0.34 & 1.00 & 0.41 & 0.39 \\
+保利发展 & 0.48 & 0.29 & 0.41 & 1.00 & 0.22 \\
+贵州茅台 & 0.27 & 0.12 & 0.39 & 0.22 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+可以看出，由于这5只股票来自不同的行业，其相关性相对较低，均在0.5以下，
+说明行业对股票收益率的变化有不小的影响。
+接下来去除行业的影响，我们分别选择这五个行业内部的5只股票，
+再次计算收益率并绘制收益率相关性矩阵如下：
+
+\begin{table}[H]
+\centering
+\caption{金融行业股票收益率相关系数}
+\begin{tabular}{lccccc}
+\toprule
+ & 工商银行 & 建设银行 & 农业银行 & 中国银行 & 招商银行 \\
+\midrule
+工商银行 & 1.00 & 0.84 & 0.85 & 0.81 & 0.66 \\
+建设银行 & 0.84 & 1.00 & 0.84 & 0.81 & 0.70 \\
+农业银行 & 0.85 & 0.84 & 1.00 & 0.85 & 0.66 \\
+中国银行 & 0.81 & 0.81 & 0.85 & 1.00 & 0.63 \\
+招商银行 & 0.66 & 0.70 & 0.66 & 0.63 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{能源行业股票收益率相关系数}
+\begin{tabular}{lccccc}
+\toprule
+ & 中国石油 & 中国神华 & 中国石化 & 兖矿能源 & 陕西煤业 \\
+\midrule
+中国石油 & 1.00 & 0.57 & 0.81 & 0.47 & 0.44 \\
+中国神华 & 0.57 & 1.00 & 0.60 & 0.69 & 0.69 \\
+中国石化 & 0.81 & 0.60 & 1.00 & 0.47 & 0.47 \\
+兖矿能源 & 0.47 & 0.69 & 0.47 & 1.00 & 0.75 \\
+陕西煤业 & 0.44 & 0.69 & 0.47 & 0.75 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{材料行业股票收益率相关系数}
+\begin{tabular}{lccccc}
+\toprule
+ & 万华化学 & 紫金矿业 & 天齐锂业 & 恩捷股份 & 赣锋锂业 \\
+\midrule
+万华化学 & 1.00 & 0.34 & 0.24 & 0.20 & 0.30 \\
+紫金矿业 & 0.34 & 1.00 & 0.28 & 0.12 & 0.32 \\
+天齐锂业 & 0.24 & 0.28 & 1.00 & 0.34 & 0.73 \\
+恩捷股份 & 0.20 & 0.12 & 0.34 & 1.00 & 0.44 \\
+赣锋锂业 & 0.30 & 0.32 & 0.73 & 0.44 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{房地产行业股票收益率相关系数}
+\begin{tabular}{lccccc}
+\toprule
+ & 保利发展 & 万科A & 招商蛇口 & 金地集团 & 新城控股 \\
+\midrule
+保利发展 & 1.00 & 0.70 & 0.77 & 0.77 & 0.66 \\
+万科A & 0.70 & 1.00 & 0.59 & 0.68 & 0.58 \\
+招商蛇口 & 0.77 & 0.59 & 1.00 & 0.67 & 0.61 \\
+金地集团 & 0.77 & 0.68 & 0.67 & 1.00 & 0.58 \\
+新城控股 & 0.66 & 0.58 & 0.61 & 0.58 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{日常消费行业股票收益率相关系数}
+\begin{tabular}{lccccc}
+\toprule
+ & 贵州茅台 & 五粮液 & 海天味业 & 山西汾酒 & 泸州老窖 \\
+\midrule
+贵州茅台 & 1.00 & 0.77 & 0.48 & 0.62 & 0.71 \\
+五粮液 & 0.77 & 1.00 & 0.51 & 0.72 & 0.81 \\
+海天味业 & 0.48 & 0.51 & 1.00 & 0.49 & 0.49 \\
+山西汾酒 & 0.62 & 0.72 & 0.49 & 1.00 & 0.73 \\
+泸州老窖 & 0.71 & 0.81 & 0.49 & 0.73 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+通过这5个行业内部的股票相关性矩阵可以看出，大部分股票收益率的相关性明显提升到0.5以上，
+进一步验证了行业对股票收益率确实有较大影响。
+
+具体来看，金融行业和房地产行业的股票收益率相关性最高，相关系数均在0.5以上，
+说明这两类行业受到市场的整体影响较大；
+能源行业、日常消费行业股票收益率相关性中等，材料行业相关性较低，
+说明行业内部也存在一定的差异。
+
+接下来我们选择4个不同品种的期货进行相关性分析，根据股票相关性分析的结果，即行业对股票收益率的影响，
+再加上期货依赖于标的资产，这里得到的相关性也应该较低。绘制相关性矩阵如下：
+
+\begin{table}[H]
+\centering
+\caption{商品期货收益率相关系数矩阵}
+\begin{tabular}{lcccc}
+\toprule
+ & 动力煤 & 豆粕 & 沪镍 & 螺纹钢 \\
+\midrule
+动力煤 & 1.00 & -0.01 & 0.05 & -0.01 \\
+豆粕 & -0.01 & 1.00 & 0.37 & 0.19 \\
+沪镍 & 0.05 & 0.37 & 1.00 & 0.42 \\
+螺纹钢 & -0.01 & 0.19 & 0.42 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+如图，期货收益率序列之间的确呈现出较低的相关性，甚至低于0.1，
+说明除了标的资产的影响，期货还因为交易机制等其他因素，不同品种之间的相关性进一步降低。
+
+
+\end{document}
